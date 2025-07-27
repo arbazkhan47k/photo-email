@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capture & Email</title>
+</head>
+<body>
+  <h2>📸 Click & Send Photo</h2>
+  <video id="video" width="320" height="240" autoplay></video>
+  <br>
+  <button onclick="captureAndSend()">Send Photo</button>
+  <canvas id="canvas" width="160" height="120" style="display:none;"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    emailjs.init("nXW97r7MQMhU-WnkY"); // ✅ Public Key
+
+    // 📷 Start Camera
+    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+      document.getElementById("video").srcObject = stream;
+    });
+
+    function captureAndSend() {
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // 🖼️ Draw a smaller, compressed image (160x120)
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // 🧬 Convert to compressed base64 PNG
+      const photo = canvas.toDataURL("image/jpeg", 0.6); // compression 60%
+
+      emailjs.send("service_zugy94l", "template_6nsxej8", {
+        photo_data: photo,
+        to_name: "Arbaz"
+      })
+      .then(() => {
+        alert("✅ Email sent successfully!");
+      })
+      .catch((err) => {
+        alert("❌ Failed to send email. Check browser console.");
+        console.error("EmailJS Error:", err);
+      });
+    }
+  </script>
+</body>
+</html>
